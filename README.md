@@ -1,1 +1,1 @@
-This is where all my code that involes me learning or personal projects gets dumped. Will be used in the future to showcase my coding ability
+This is where all my code that involes me learning or personal projects gets dumped. Will be used in the future to showcase my coding ability. Learning folder will contain all code that was either formed through book exercises, examples or tutorials. Projects folder will constist of personal ideas and code. Which will help measure my ability to produce.
