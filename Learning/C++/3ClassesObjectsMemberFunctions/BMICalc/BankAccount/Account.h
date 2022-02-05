@@ -15,6 +15,21 @@ class Account
                 }
             }
 
+        //Member function to withdraw from the balance
+        void withdraw(int withdrawAmount)
+        {
+            if (withdrawAmount > 0 && withdrawAmount < balance) //Checks to make sure withdraw amount is greater than 0 and that the account has enough
+            {
+                balance -= withdrawAmount; //Withdraws amount from the balance data member
+            }
+            if (withdrawAmount > balance)
+            {
+                std::cout << "Withdrawal amount exceeded account balance\n";
+            }
+        }
+
+
+
         //Member function that deposits (adds) only a valid amount to the balance
         void deposit(int depositAmount)
         {

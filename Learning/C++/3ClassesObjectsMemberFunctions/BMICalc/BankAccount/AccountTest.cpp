@@ -34,4 +34,15 @@ int main()
     // display balances
     cout << "\n\n" << account1.getName() << " balance: " << account1.getBalance() << endl;
     cout << account2.getName() << " balance: " << account2.getBalance() << endl;
+
+    cout << "Enter withdrawal amount for account1: "; //Prompt
+    int withdraw;
+    cin >> withdraw;
+    cout << "Withdrawing " << withdraw << " from the balance of account 1" << endl;
+    account1.withdraw(withdraw);
+
+    // display balances
+    cout << "\n" << account1.getName() << " balance: " << account1.getBalance() << endl;
+
+
 }
