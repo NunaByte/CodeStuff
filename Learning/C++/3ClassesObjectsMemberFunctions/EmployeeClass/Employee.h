@@ -10,6 +10,10 @@ class Employee
             {
                 salary = sal;
             }
+            if(sal < 0)
+            {
+                salary = 0;
+            }
         }
 
         //Set and get for first name
@@ -34,7 +38,14 @@ class Employee
         //Set and get for Salary
         void setSalary(int sal)
         {
-            salary = sal;
+            if(sal > 0)
+            {
+                salary = sal;
+            }
+            if(sal < 0)
+            {
+                salary = 0;
+            }
         }
         int getSalary()
         {   
