@@ -1,5 +1,5 @@
 /*Calculates how much to charge depending on how long
-care was parked.*/
+car was parked.*/
 #include <iostream>
 #include <string>
 #include <iomanip>
