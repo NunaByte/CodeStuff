@@ -1,0 +1,4 @@
+Algorithm for TicTacToe Board.
+1. Get user char input
+2. Use input to place char of X or O inside array of chars
+3. Check if 3 of either X or O line up horizonatally, vertically or diagonally after each user input.

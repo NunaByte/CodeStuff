@@ -1,0 +1,12 @@
+1. Create a mini game, where the player is forced to fight demons, 
+but has the option to interact with a shop for upgrades to make the game easier.
+
+2. There should be a menu that allows the player to start the game, quit the game and enter the dark shop.
+
+3. Gameplay should consist of encountering a demon of 3 types, 1 being the strongest of the 3 types,
+these demons will drop the currency known as gold for the player to obtain.
+
+4. During combat the player should have the option to attack, run or use a health potion they purchased from the dark shop.
+
+
+
