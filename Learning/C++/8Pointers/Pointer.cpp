@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-    void swap(int &x, int &y);
+void swap(int &x, int &y);
 
 int main()
 {
