@@ -1,0 +1,38 @@
+//Palindrome Number Checker
+convert number to string
+while low index is less than high index, check if string at first index is not equal to string at second index, if so it is not a palindrome
+Otherwise increment the low index and decrement the high index
+
+
+
+//Array has duplicate
+
+sort array
+loop through array
+if current index is equal to current index+1 return true
+
+
+
+//Disappeared in an array
+
+Create set for unique array list
+Copy array elements into set
+check if any numbers are not present in the set
+
+
+// Plus Minus
+loop through array
+track how many numbers are less than 0
+track how many numbers are greater than 0
+track how many numbers are equal to 0
+
+// Rotate array of size n by d elements
+
+
+
+
+
+
+
+
+
