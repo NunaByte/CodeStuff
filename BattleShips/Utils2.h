@@ -8,6 +8,7 @@
 
 #include "Utils.h"
 #include <iostream>
+#include <stdlib.h>
 #include <cctype>
 
 using namespace std;
@@ -157,7 +158,7 @@ int GetInteger(const char * prompt, const char* error, const int validInput[], i
 
 void ClearScreen()
 {
-	system("clear");
+	system("CLS");
 }
 
 void WaitForKeyPress()
