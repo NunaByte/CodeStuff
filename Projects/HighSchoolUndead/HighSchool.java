@@ -1,3 +1,4 @@
+//Old small project from high school.
 package Projects.HighSchoolUndead;
 
 import java.io.*;
