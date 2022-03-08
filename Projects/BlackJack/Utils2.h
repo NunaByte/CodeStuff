@@ -164,5 +164,4 @@ void ClearScreen()
 void WaitForKeyPress()
 {
 	system("pause");//for windows only!
-	system("read -n 1 -s -p \"Press any key to continue...\";echo");
 }

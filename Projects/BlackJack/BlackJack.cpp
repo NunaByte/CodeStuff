@@ -22,15 +22,6 @@ struct Selection
     int col;
 };
 
-
-enum PlayerState
-{
-    PS_BUST = 0,
-    PS_STAY,
-    PS_HIT,
-    PS_NONE
-};
-
 enum PlayerGameState
 {
     PGS_WIN = 0,
@@ -42,10 +33,9 @@ enum PlayerGameState
 struct Dealer
 {
     char name;
-    Card holding[4];
+    Card holding[17];
     int cardCount = 0;
     int cardValue = 0;
-    PlayerState playerState;
     PlayerGameState state;
     int balance;
 };
@@ -53,11 +43,9 @@ struct Dealer
 struct Player
 {
     char name;
-    Card holding[4];
+    Card holding[3];
     int cardCount = 0;
     int cardValue = 0;
-    bool stillPlaying = true;
-    PlayerState playerState;
     PlayerGameState state;
     int balance;
 };
@@ -125,7 +113,7 @@ struct Player
     -----------------------------------------
 */
 
-void PlayGame(Player &player,Dealer &dealer,Card cards[4][13]);
+void PlayGame(Player &player,Dealer &dealer,Card cards[4][13],bool &stillPlaying);
 void SetCards(Card cards[4][13]);
 void DealCards(Player &player, Dealer &dealer, Card cards[4][13], int count);
 void DealCards(Player &player, Card cards[4][13], int count);
@@ -133,135 +121,222 @@ void DealCards(Dealer &dealer, Card cards[4][13], int count);
 void calcTotal(Player &player, Dealer &dealer);
 bool allCardsUsed(Card cards[4][13]);
 void displayLogo();
-bool checkHasWon(Player &player);
-bool checkHasWon(Dealer &dealer);
-void setPlayerGameState(Player &player, Dealer &dealer);
 void displayHand(Player &player);
 void displayHand(Dealer &dealer);
+void resetStats(Player &player, Dealer &dealer, Card cards[4][13]);
 
 int main()
 {
     srand(time(NULL));
-
     Dealer dealer;
     Player player;
     Card cards[4][13];
-    
-    do
-    {
-        PlayGame(player, dealer, cards);
+    int choice;
+    bool stillPlaying = true;
+    bool running = true;
 
-    }while(player.stillPlaying);
+    while(running)
+    {
+        ClearScreen();
+        displayLogo();
+        const int validInput[2] = {1,2};
+        choice = GetInteger("Start Game(1)\nExit Game(2)\n\nEnter Selection: ",INPUT_ERROR_STRING,validInput,2);
+
+        if(choice == 1)
+        {
+            stillPlaying = true;
+            do
+            {
+            
+            PlayGame(player, dealer, cards, stillPlaying);
+
+            }while(stillPlaying);
+        }
+        else if(choice == 2)
+        {
+            break;
+        }
+    
+    
+    }
 
     return 0;
 }
 
 
 
-void PlayGame(Player &player,Dealer &dealer,Card cards[4][13])
+void PlayGame(Player &player,Dealer &dealer,Card cards[4][13], bool &stillPlaying)
 {
-    ClearScreen();
-    displayLogo();
-    SetCards(cards);
-    DealCards(player, dealer, cards, 3);
-    calcTotal(player, dealer);
-    setPlayerGameState(player, dealer);
+    while(stillPlaying)
+    {
+        resetStats(player, dealer, cards);
+        ClearScreen();
+        displayLogo();
+        SetCards(cards);
+        DealCards(player, dealer, cards, 2);
+        calcTotal(player, dealer);
+        displayHand(player);
+        displayHand(dealer);
 
-    displayHand(player);
-    displayHand(dealer);
+        if((player.cardValue > dealer.cardValue) && (player.cardValue == 21))
+        {
+            cout << "Player has won with a BLACKJACK!";
+            cout << endl;
+            break;
+        }
+        else if((player.cardValue > dealer.cardValue) && (player.cardValue > 21))
+        {
+            cout << "Dealer has won, player has bust :(";
+            cout << endl;
+            break;
+        }
+        
 
-    if(checkHasWon(player))
-    {
-        cout << "Player has won with a BLACKJACK!";
-    }
-    else if(checkHasWon(dealer))
-    {
-        cout << "Dealer has won with a BLACKJACK :(";
-    }
-    else if(player.state == PGS_PUSH && dealer.state == PGS_PUSH)
-    {
-        cout << "There is a draw, no one wins this round";
-    }
+        if((dealer.cardValue > player.cardValue) && (dealer.cardValue == 21))
+        {
+            cout << "Dealer has won with a BLACKJACK :(";
+            cout << endl;
+            break;
+        }
+        else if((dealer.cardValue > player.cardValue) && (dealer.cardValue > 21))
+        {
+            cout << "Player has won, dealer has bust";
+            cout << endl;
+            break;
+        }
+        else if(dealer.cardValue == player.cardValue)
+        {
+            cout << "There are no victors this round";
+            cout << endl;
+            break;
+        }
+    
 
-    while(!(checkHasWon(player)) && !(checkHasWon(dealer)))
-    {
-        char validInput[] = {'Y','N'};
-        char playerChoice = GetCharacter("Player would you like to hit? (Y or N): ",INPUT_ERROR_STRING,validInput,1,CC_UPPER_CASE);
+        char validInput[2] = {'Y','N'};
+        char playerChoice = GetCharacter("Player would you like to hit? (Y or N): ",INPUT_ERROR_STRING,validInput,2,CC_UPPER_CASE);
         if(playerChoice == 'Y')
         {
             DealCards(player, cards, 1);
+            calcTotal(player, dealer);
             cout << "Player is dealt an extra card";
-            setPlayerGameState(player, dealer);
             ClearScreen();
             displayLogo();
             displayHand(player);
             displayHand(dealer);
             WaitForKeyPress();
+
+            //Check for win after player hits
+            if((player.cardValue > dealer.cardValue) && (player.cardValue == 21))
+            {
+                cout << "Player has won";
+                cout << endl;
+                break;
+            }
+            else if((player.cardValue > dealer.cardValue) && (player.cardValue > 21))
+            {
+                cout << "Dealer has won, player has bust :(";
+                cout << endl;
+                break;
+            }
+            
+            if((dealer.cardValue > player.cardValue) && (dealer.cardValue == 21))
+            {
+                cout << "Dealer has won :(";
+                cout << endl;
+                break;
+            }
+            else if((dealer.cardValue > player.cardValue) && (dealer.cardValue > 21))
+            {
+                cout << "Player has won, dealer has bust";
+                cout << endl;
+                break;
+            }
         }
-        else
+        else if(playerChoice == 'N')
         {
             ClearScreen();
             displayLogo();
-            cout << "Player decided to stay";
+            displayHand(player);
+            displayHand(dealer);
+            cout << "Player decided to stay" << endl;
             WaitForKeyPress();
         }
-        //Check for win after player hits
-        if(checkHasWon(player))
-        {
-            cout << "Player has won!";
-        }
-        else if(checkHasWon(dealer))
-        {
-            cout << "Dealer has won, the player has bust :(";
-        }
-        else if(player.state == PGS_PUSH && dealer.state == PGS_PUSH)
-        {
-            cout << "There is a draw, no one wins this round";
-            break;
-        }
-        //Dealer hits till win or lose
-        while(!(checkHasWon(player)) && !(checkHasWon(dealer)))
+        
+        //Dealer hits till value is greater than 17
+        while(dealer.cardValue < 17)
         {
             DealCards(dealer, cards, 1);
-            cout << "Dealer draws another card";
-            setPlayerGameState(player, dealer);
+            calcTotal(player, dealer);
             ClearScreen();
             displayLogo();
             displayHand(player);
+            cout << "Dealer draws another card" << endl;
+            cout << "----------------------------------------";
+            cout << endl;
             displayHand(dealer);
+            WaitForKeyPress();
         }
         //Returns who has won or lost
-        if(checkHasWon(dealer))
+        if((player.cardValue > dealer.cardValue) && (player.cardValue == 21))
         {
-            cout << "Dealer has won the round :(";
-        }
-        else if(checkHasWon(player))
-        {
-            cout << "Player has won!, the dealer has bust!";
-        }
-        else if(player.state == PGS_PUSH && dealer.state == PGS_PUSH)
-        {
-            cout << "There is a draw, no one wins this round";
+            cout << "Player has won";
+            cout << endl;
             break;
         }
+        else if((player.cardValue > dealer.cardValue) && (player.cardValue > 21))
+        {
+            cout << "Dealer has won, player has bust :(";
+            cout << endl;
+            break;
+        }
+        
+
+        if((dealer.cardValue > player.cardValue) && (dealer.cardValue == 21))
+        {
+            cout << "Dealer has won :(";
+            cout << endl;
+            break;
+        }
+        else if((dealer.cardValue > player.cardValue) && (dealer.cardValue > 21))
+        {
+            cout << "Player has won, dealer has bust";
+            cout << endl;
+            break;
+        }
+        else if((dealer.cardValue > player.cardValue) && (dealer.cardValue < 21))
+        {
+            cout << "Dealer has won this round";
+            cout << endl;
+            break;
+        }
+        else if((dealer.cardValue < player.cardValue) && (dealer.cardValue < 21))
+        {
+            cout << "Player has won this round";
+            cout << endl;
+            break;
+        }
+        else if(dealer.cardValue == player.cardValue)
+        {
+            cout << "There is no victor this round";
+            cout << endl;
+        }
+        
     }
 
-    char playerRoundChoice;
-    char validInput[] = {'Y','N'};
-    playerRoundChoice = GetCharacter("Would you like to play another round? (Y or N): ",INPUT_ERROR_STRING,validInput,1,CC_UPPER_CASE);
+    
+        char playerRoundChoice;
+        char validInput[2] = {'Y','N'};
+        playerRoundChoice = GetCharacter("Would you like to play another round? (Y or N): ",INPUT_ERROR_STRING,validInput,2,CC_UPPER_CASE);
 
-    if(playerRoundChoice == 'Y')
-    {
-        player.stillPlaying = true;
-    }
-    else
-    {
-        player.stillPlaying = false;
-        cout << "Thank you for playing Black Jack!";
-        WaitForKeyPress();
-    }
-
-
+        if(playerRoundChoice == 'Y')
+        {
+            stillPlaying = true;
+        }
+        else if(playerRoundChoice == 'N')
+        {
+            stillPlaying = false;
+            cout << "Thank you for playing Black Jack!";
+        }
 }
 
 
@@ -280,13 +355,19 @@ void DealCards(Player &player, Dealer &dealer, Card cards[4][13], int count)
 
             if(cards[deal.row][deal.col].isUsed != true)
             {
-                player.holding[player.cardCount + i] = cards[deal.row][deal.col];
+                if(player.cardCount > 1)
+                {
+                    player.holding[player.cardCount + i] = cards[deal.row][deal.col];
+                }
+                else
+                {
+                    player.holding[i] = cards[deal.row][deal.col];
+                }
                 cards[deal.row][deal.col].isUsed = true;
                 player.cardCount++;
+                break;
             }
 
-            if(allCardsUsed(cards))
-                break;
 
         }while(cards[deal.row][deal.col].isUsed == false);
 
@@ -298,18 +379,21 @@ void DealCards(Player &player, Dealer &dealer, Card cards[4][13], int count)
 
             if(cards[deal.row][deal.col].isUsed != true)
             {
-                dealer.holding[dealer.cardCount + i] = cards[deal.row][deal.col];
+               if(dealer.cardCount > 1)
+                {
+                    dealer.holding[player.cardCount + i] = cards[deal.row][deal.col];
+                }
+                else
+                {
+                    dealer.holding[i] = cards[deal.row][deal.col];
+                }
                 cards[deal.row][deal.col].isUsed = true;
                 dealer.cardCount++;
-            }
-
-            if(allCardsUsed(cards))
                 break;
+            }
 
         }while(cards[deal.row][deal.col].isUsed == false);
      
-     if(allCardsUsed(cards))
-            break;
     }
 }
 
@@ -326,18 +410,21 @@ void DealCards(Player &player, Card cards[4][13], int count)
 
             if(cards[deal.row][deal.col].isUsed != true)
             {
-                player.holding[player.cardCount + i] = cards[deal.row][deal.col];
+                if(player.cardCount > 1)
+                {
+                    player.holding[player.cardCount + i] = cards[deal.row][deal.col];
+                }
+                else
+                {
+                    player.holding[i] = cards[deal.row][deal.col];
+                }
                 cards[deal.row][deal.col].isUsed = true;
                 player.cardCount++;
-            }
-
-            if(allCardsUsed(cards))
                 break;
+            }
 
         }while(cards[deal.row][deal.col].isUsed == false);
      
-     if(allCardsUsed(cards))
-            break;
     }
 
 }
@@ -355,44 +442,21 @@ void DealCards(Dealer &dealer, Card cards[4][13], int count)
 
             if(cards[deal.row][deal.col].isUsed != true)
             {
-                dealer.holding[dealer.cardCount + i] = cards[deal.row][deal.col];
+                if(dealer.cardCount > 1)
+                {
+                    dealer.holding[dealer.cardCount + i] = cards[deal.row][deal.col];
+                }
+                else
+                {
+                    dealer.holding[i] = cards[deal.row][deal.col];
+                }
                 cards[deal.row][deal.col].isUsed = true;
                 dealer.cardCount++;
             }
 
-            if(allCardsUsed(cards))
-                break;
-
         }while(cards[deal.row][deal.col].isUsed == false);
-     
-     if(allCardsUsed(cards))
-            break;
     }
 }
-
-bool allCardsUsed(Card cards[4][13])
-{
-    int used = 0;
-    for(int r = 0; r < 4; r++)
-    {
-        for(int c = 0; c < 13; c++)
-        {
-            if(cards[r][c].isUsed == true)
-            {
-                used++;
-            }
-        }
-    }
-    if(used == 52)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 
 void calcTotal(Player &player, Dealer &dealer)
 {
@@ -410,54 +474,6 @@ void calcTotal(Player &player, Dealer &dealer)
         sum2 += dealer.holding[i].value;
     }
     dealer.cardValue = sum2;
-}
-
-void setPlayerGameState(Player &player, Dealer &dealer)
-{
-    player.state = PGS_NONE;
-    dealer.state = PGS_NONE;
-
-    int playerValue = player.cardValue;
-    int dealerValue = dealer.cardValue;
-
-    if((playerValue > dealerValue) && (playerValue == 21))
-    {
-       player.state = PGS_WIN;
-    }
-    else if((dealerValue > playerValue) && (dealerValue == 21))
-    {
-       dealer.state = PGS_WIN;
-    }
-    else if((dealerValue == 21) && (playerValue == 21))
-    {
-        dealer.state = PGS_PUSH;
-        player.state = PGS_PUSH;
-    }
-    //////////////////////////////////////////////////
-    if((playerValue > dealerValue) && (playerValue > 21))
-    {
-        player.state = PGS_LOSE;
-    }
-    else if((dealerValue > playerValue) && (dealerValue > 21))
-    {
-        dealer.state = PGS_LOSE;
-    }
-}
-
-bool checkHasWon(Player &player)
-{
-    if(player.state == PGS_WIN)
-    {
-        return true;
-    }
-    else if(player.state == PGS_LOSE)
-    {
-        return false;
-    }
-    else
-    {
-        return false;
-    }
 }
 
 void displayHand(Player &player)
@@ -492,21 +508,21 @@ void displayHand(Dealer &dealer)
     cout << "HAND TOTAL: " << dealer.cardValue;
     cout << endl;
     cout << "----------------------------------------";
+    cout << endl;
 }
 
-bool checkHasWon(Dealer &dealer)
+void resetStats(Player &player, Dealer &dealer, Card cards[4][13])
 {
-    if(dealer.state == PGS_WIN)
+    player.cardCount = 0;
+    player.cardValue = 0;
+    dealer.cardCount = 0;
+    dealer.cardValue = 0;
+    for(int r = 0; r < 4; r++)
     {
-        return true;
-    }
-    else if(dealer.state == PGS_LOSE)
-    {
-        return false;
-    }
-    else
-    {
-        return false;
+        for(int c = 0; c < 13; c++)
+        {
+            cards[r][c].isUsed = false;
+        }
     }
 }
 
